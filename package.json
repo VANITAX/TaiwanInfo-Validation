@@ -1,0 +1,41 @@
+{
+  "name": "Vanitax(Roxy.ver)",
+  "version": "0.2.0",
+  "description": "Github-repository: https://github.com/VANITAX/ProjectTemplate.git",
+  "main": "gulpfile.js",
+  "devDependencies": {
+    "autoprefixer-core": "^5.2.1",
+    "browser-sync": "^2.8.2",
+    "del": "^0.1.2",
+    "gulp": "^3.9.0",
+    "gulp-autoprefixer": "^2.3.1",
+    "gulp-changed": "^1.0.0",
+    "gulp-compass": "^1.3.1",
+    "gulp-concat": "^2.6.0",
+    "gulp-html-replace": "^1.1.0",
+    "gulp-html2jade": "^0.1.0",
+    "gulp-imagemin": "^2.3.0",
+    "gulp-jade": "^1.1.0",
+    "gulp-jshint": "^1.11.2",
+    "gulp-minify-css": "^1.2.0",
+    "gulp-notify": "^2.0.1",
+    "gulp-plumber": "^0.6.4",
+    "gulp-rename": "^1.2.0",
+    "gulp-ruby-sass": "^0.7.1",
+    "gulp-sourcemaps": "^1.5.2",
+    "gulp-uglify": "^1.2.0",
+    "gulp-util": "^3.0.0",
+    "gulp-watch": "^3.0.0",
+    "imagemin-pngquant": "^4.1.2",
+    "jshint-stylish": "^2.0.1",
+    "map-stream": "0.0.6",
+    "merge-stream": "^0.1.5"
+  },
+  "repository": {
+    "type": "git",
+    "url": ""
+  },
+  "bugs": {
+    "url": ""
+  }
+}
