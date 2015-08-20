@@ -1,11 +1,83 @@
 var PluginPackage = function(){};
 PluginPackage.prototype.FormValidation = function(){};
 PluginPackage.prototype.Placehold = function(){};
+PluginPackage.prototype.NumberOnly = function(){
+  var _method = {};
+  var _CustomMethod = {};
+  var _setMethod;
+  _method.target = $(".numbersonly");
+  _setMethod = $.extend(_method, _CustomMethod);
+  this.setCustomOPT = function(_OPT){
+    _CustomMethod = _OPT;
+  };
+  var haveChinese = function(s) { 
+    return s.search(  RegExp("[一-"+String.fromCharCode(40869)+"]") ) > -1;
+  };
+  var numbersonly = function(myfield, e, dec){
+  var key;
+  var keychar;
+  if (window.event)
+     key = window.event.keyCode;
+  else if (e)
+     key = e.which;
+  else
+     return true;
+  keychar = String.fromCharCode(key);
+  if (isNaN(keychar)) {
+    return false;
+  }
+  if ((key===null) || (key===0) || (key==8) || 
+      (key==9) || (key==13) || (key==27) || (key==46))
+     return true;
+
+  // numbers
+  else if ((("0123456789").indexOf(keychar) > -1))
+     return true;
+
+  // decimal point jump
+  else if (dec && (keychar == ".")){
+     myfield.form.elements[dec].focus();
+     return false;
+    }
+     else
+        return false;
+  };
+  var numbersonlyKeyCheck = function(_target){
+    _target.on("keydown",function(event){
+      var c = $(this).val();
+      var n = haveChinese(c);
+      if( event.keyCode == 8 || event.keyCode == 9 || 
+          event.keyCode == 13 || event.keyCode == 46 || 
+          event.keyCode == 190 || event.keyCode == 37 || 
+          event.keyCode == 38 || event.keyCode == 39 || 
+          event.keyCode == 40 || event.keyCode == 96 || 
+          event.keyCode == 97 || event.keyCode == 98 || 
+          event.keyCode == 99 || event.keyCode == 100 || 
+          event.keyCode == 101 || event.keyCode == 102 || 
+          event.keyCode == 103 || event.keyCode == 104 || 
+          event.keyCode == 105 || event.keyCode == 108){
+        return true;
+      }else if(n){
+        return false;
+      }
+      return numbersonly(this, event);
+    });
+  };
+  this.restrict = function(){
+    _setMethod = $.extend(_method, _CustomMethod);
+    numbersonlyKeyCheck(_setMethod.target);
+  };
+  this.getCustomMethod = function(){
+    _setMethod = $.extend(_method, _CustomMethod);
+    return _setMethod;
+  };
+};
+
 PluginPackage.prototype.Message = function(){
   var _MESSAGE = [];
   _MESSAGE[0] = "不是中文";
   _MESSAGE[1] = "不是英文";
-  _MESSAGE[2] = "室內電話請加上區碼";
+  _MESSAGE[2] = "請確認室內電話區碼是否正確";
   _MESSAGE[3] = "請確認室內電話是否正確";
   _MESSAGE[4] = "請確認行動電話號碼是否正確";
   _MESSAGE[5] = "請輸入行動電話號碼";
@@ -17,20 +89,61 @@ PluginPackage.prototype.Message = function(){
 PluginPackage.prototype.FormValidation.prototype.Lib = function() {
   var Library = {};
   Library.TelAreaCode = {
-    "02":["基隆市","台北市","台北縣"],
-    "03":["桃園縣","新竹市","新竹縣","宜蘭縣","花蓮縣"],
-    "37":["苗栗縣"],
-    "04":["台中市","台中縣","彰化縣"],
-    "049":["南投縣"],
-    "05":["雲林縣","嘉義市","嘉義縣"],
-    "06":["台南市","台南縣","澎湖縣"],
-    "07":["高雄市","高雄縣","東沙","南沙"],
-    "08":["屏東縣"],
-    "089":["台東縣"],
-    "082":["金門縣"],
-    "0836":["馬祖"],
-    "0826":["烏坵"],
-    "09":["CellPhone"]
+    "02":{
+      TELCodeNum: 8,
+      area:["基隆市","台北市","台北縣"]
+    },
+    "03":{
+      TELCodeNum: 8,
+      area:["桃園縣","新竹市","新竹縣","宜蘭縣","花蓮縣"]
+    },
+    "37":{
+      TELCodeNum: 7,
+      area:["苗栗縣"]
+    },
+    "04":{
+      TELCodeNum: 7,
+      area:["台中市","台中縣","彰化縣"]
+    },
+    "049":{
+      TELCodeNum: 7,
+      area:["南投縣"]
+    },
+    "05":{
+      TELCodeNum: 7,
+      area:["雲林縣","嘉義市","嘉義縣"]
+    },
+    "06":{
+    TELCodeNum: 7,
+    area:["台南市","台南縣","澎湖縣"]
+    },
+    "07":{
+    TELCodeNum: 7,
+    area:["高雄市","高雄縣","東沙","南沙"]
+    },
+    "08":{
+      TELCodeNum: 7,
+      area:["屏東縣"]
+    },
+    "089":{
+      TELCodeNum: 6,
+      area:["台東縣"]
+    },
+    "082":{
+      TELCodeNum: 6,
+      area:["金門縣"]
+    },
+    "0836":{
+      TELCodeNum: 5,
+      area:["馬祖"]},
+    "0826":{
+      TELCodeNum: 5,
+      area:["烏坵"]
+    },
+    "09":{
+      TELCodeNum: 6,
+      area:["CellPhone"]
+    }
   };
 
   Library.Cityzip = {
@@ -215,36 +328,70 @@ PluginPackage.prototype.FormValidation.prototype.phoneValid = function(){
   var _pluginPack = new PluginPackage();
   var _Message = new _pluginPack.Message();
   var _formvalid = new _pluginPack.FormValidation();
+  var _validAdd = new _formvalid.addressValid();
+  var _addressMethod = new _validAdd.getCustomMethod();
   var _lib = new _formvalid.Lib();
-
   var _method = {};
   var _CustomMethod = {};
   var _setMethod;
   _method.target = $('input[valid="phone"]');
   _method.restrictMode = "Hybrid";  // "Hybrid" , "Tel" , "Phone"
-  _method.autoFixFormat = false;
-  _method.numberOnly = true; 
-  _method.detailCheck = false;
-  _method.chineseNumAllow = false;
+  _method.numberOnly = false; // 還沒寫
+  _method.detailCheck = true;
+  _method.chineseNumAllow = false; // 還沒寫
+  _method.callback = "";
+  var extentFunction = function(_Custom){
+    if(_Custom.numberOnly){
+      var numonly = new _pluginPack.NumberOnly();
+      numonly.setCustomOPT({
+        target: _Custom.target
+      });
+      numonly.restrict();
+    }
+    if(_Custom.chineseNumAllow){
+      console.log("chineseNumAllow");
+    }
+    if(_Custom.callback){
+      _Custom.callback();
+    }
+  };
+
+
   var judgePhoneNumber = function(_val,_setMethod){
     var result = false;
-    var teltailMixNum;
     if(_val.indexOf("(") === 0 && _val.indexOf(")") != -1){
-      var telAreaCode = _val.substr(_val.indexOf("(") + 1 , _val.indexOf(")")-1 );
-      $.each(_lib.getMethod().TelAreaCode , function(a,b){
-        if(telAreaCode == a){
-          if(detailCheck){
-          }else{
-            if(telAreaCode.length == 4){teltailMixNum = 5}else{teltailMixNum = 6}
-            if(_val.substr(_val.indexOf(")")-1,_val.length).replace("-","") >= teltailMixNum ){
-              result = true;
+      var inputAreaCode = _val.substr(_val.indexOf("(") + 1 , _val.indexOf(")")-1 );
+      $.each(_lib.getMethod().TelAreaCode , function(areaCode,areaContain){
+        if(inputAreaCode == areaCode){
+          var teltailMixNum = areaContain.TELCodeNum;
+          if(_val.substr(_val.indexOf(")")+1,_val.length).replace("-","").length >= teltailMixNum ){
+            if(_setMethod.detailCheck){
+              var addressValue = _addressMethod.target.val();
+              var areaCodeCompare = false;
+              for(var i = 0; i < areaContain.area.length; i++){
+                if(addressValue.indexOf(areaContain.area[i]) != -1){
+                  areaCodeCompare = true;
+                }
+              }
+              if(areaCodeCompare){
+                result = true;
+              }else{
+                alert("您所輸入的電話區碼處與你的居住縣市不匹配");
+                result = false;
+              }
             }else{
-              alert(_Message.alertMessage(3));
-              result = false;
+              result = true;
             }
+          }else{
+            alert(_Message.alertMessage(3));
+            result = false;
           }
         }
       });
+      if(inputAreaCode == "00" || inputAreaCode == "01"){
+        alert(_Message.alertMessage(2));
+        result = false;
+      }
       return result;
     }else if(_val.substr(0,2) == "09"){
       if(_val.indexOf("-") == 4){
@@ -262,8 +409,11 @@ PluginPackage.prototype.FormValidation.prototype.phoneValid = function(){
     }
   };
 
+
   this.setCustomOPT = function(_OPT){
     _CustomMethod = _OPT;
+    _setMethod = $.extend(_method, _CustomMethod);
+    extentFunction(_setMethod);
   };
 
 
@@ -279,7 +429,6 @@ PluginPackage.prototype.FormValidation.prototype.phoneValid = function(){
       return(str);
     };
     var _makeSignDash = function (str,num){
-      console.log(str.substr(str.indexOf("(") + 1,str.indexOf(")") - 1).length);
       // 驗證4碼區碼的dash位置
       if(str.substr(str.indexOf("(") + 1,str.indexOf(")") - 1).length == 4 ){
         str = str.substr(0,str.indexOf(")") + 1)+"-"+str.substr(str.indexOf(")") + 1,str.length-1);
@@ -356,7 +505,7 @@ PluginPackage.prototype.FormValidation.prototype.phoneValid = function(){
             }
         }_target.val(finishStr);
         };
-        _target.keyup(function(){_keepCheck();});
+        _target.keyup(function(e){if(e.keyCode == 37 || e.keyCode == 39){}else{_keepCheck();}});
         _target.focus(function(){_keepCheck();});
         _target.keypress(function(e){if(e.which == 13) {_outCheck(); }});
         _target.focusout(function(){_outCheck();});
@@ -406,7 +555,7 @@ PluginPackage.prototype.FormValidation.prototype.phoneValid = function(){
           }
         _target.val(finishStr);
         };
-        _target.keyup(function(){_keepCheck();});
+        _target.keyup(function(e){if(e.keyCode == 37 || e.keyCode == 39){}else{_keepCheck();}});
         _target.focus(function(){_keepCheck();});
         _target.keypress(function(e){if(e.which == 13) {_outCheck(); }});
         _target.focusout(function(){_outCheck();});      
@@ -442,7 +591,8 @@ PluginPackage.prototype.FormValidation.prototype.phoneValid = function(){
               _target.val(finishStr);
           }
         };
-        _target.keyup(function(){_keepCheck();});
+
+        _target.keyup(function(e){if(e.keyCode == 37 || e.keyCode == 39){}else{_keepCheck();}});
         _target.focus(function(){_keepCheck();});
         _target.keypress(function(e){if(e.which == 13) {_outCheck(); }});
         _target.focusout(function(){_outCheck();});
@@ -464,29 +614,58 @@ PluginPackage.prototype.FormValidation.prototype.phoneValid = function(){
 
 
 PluginPackage.prototype.FormValidation.prototype.addressValid = function(){
-  // console.log("addressValid");
+  var _pluginPack = new PluginPackage();
+  var _Message = new _pluginPack.Message();
+  var _formvalid = new _pluginPack.FormValidation();
+  var _lib = new _formvalid.Lib();
+  var _method = {};
+  var _CustomMethod = {};
+  var _setMethod;
+
+  _method.target = $('input[valid="address"]');
+  _method.detailCheck = false;
+
+  this.setCustomOPT = function(_OPT){
+    _CustomMethod = _OPT;
+  };
+
+  this.validation = function(){
+    _setMethod = $.extend(_method, _CustomMethod);
+    var _value = _setMethod.target.val();
+    return ;
+  };
+
+  this.getCustomMethod = function(){
+    _setMethod = $.extend(_method, _CustomMethod);
+    return _setMethod;
+  };
+
 };
-
-PluginPackage.prototype.stringRestrict =function(){
-  var _opt = {
-    target: $("input[valided]"),
-    maxlength: ""
-  };
-  this.setOption = function(_setOpt){
-    _opt = _setOpt;
-  };
-  this.getOption = function(){
-    var _val = _opt.target.val();
-    // var _val = _opt;
-    return _val;
-  };
-};
-
-
+// 
+// PluginPackage.prototype.stringRestrict =function(){
+//   var _opt = {
+//     target: $("input[valided]"),
+//     maxlength: ""
+//   };
+//   this.setOption = function(_setOpt){
+//     _opt = _setOpt;
+//   };
+//   this.getOption = function(){
+//     var _val = _opt.target.val();
+//     // var _val = _opt;
+//     return _val;
+//   };
+// };
 
 
 
-// ======== run ========
+
+
+
+
+
+
+// ========test run ========
 
 $(window).on('load',function(){
   var mainPackage = new PluginPackage();
@@ -494,17 +673,23 @@ $(window).on('load',function(){
   var formvalid = new mainPackage.FormValidation();
   var validName = new formvalid.name();
   var validPhone = new formvalid.phoneValid();
+  var validAdd = new formvalid.addressValid();
   var lib = new formvalid.Lib();
+  var numRestric = new mainPackage.NumberOnly();
+  // numRestric.restrict();
   validPhone.restrictMode();
-  // validName.setCustomOPT({
-  //   langRestrict: "en"
-  // });
-
+  validName.setCustomOPT({
+    langRestrict: "en"
+  });
+  validPhone.setCustomOPT({
+    numberOnly: true,
+    callback: function(){
+      console.log("setCustomCallback!!");
+    }
+  });
 
   $('.btn-submit').click(function(e){
     e.preventDefault();
-    // console.log("name: " + validName.validation());
-    // console.log("phone: " + validPhone.validation());
     var nameCheck = validName.validation();
     var phoneCheck = validPhone.validation();
     if(nameCheck && phoneCheck){
